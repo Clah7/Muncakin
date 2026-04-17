@@ -13,9 +13,9 @@ struct ItemFormView: View {
     @State private var name: String = ""
     @State private var quantity: Double = 1
     @State private var unit: MeasurementUnit = .pcs
-    @State private var category: GearCategory = .base
-    @State private var priority: ItemPriority = .optional
-    @State private var ownership: ItemOwnership = .personal
+    @State private var category: GearCategory = .tambahan
+    @State private var priority: ItemPriority = .opsional
+    @State private var ownership: ItemOwnership = .pribadi
 
     private var isEditing: Bool { existingItem != nil }
 
@@ -26,24 +26,24 @@ struct ItemFormView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Details") {
-                    TextField("Item Name", text: $name)
+                Section("Deskripsi Barang") {
+                    TextField("Nama Barang", text: $name)
                     HStack {
-                        Text("Quantity")
+                        Text("Kuantitas")
                         Spacer()
                         TextField("Qty", value: $quantity, format: .number)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                     }
-                    Picker("Unit", selection: $unit) {
+                    Picker("Satuan", selection: $unit) {
                         ForEach(MeasurementUnit.allCases) { u in
                             Text(u.abbreviation).tag(u)
                         }
                     }
                 }
 
-                Section("Classification") {
+                Section("Klasifikasi") {
                     Picker("Category", selection: $category) {
                         ForEach(GearCategory.allCases) { cat in
                             Text(cat.rawValue.capitalized).tag(cat)
@@ -61,14 +61,14 @@ struct ItemFormView: View {
                     }
                 }
             }
-            .navigationTitle(isEditing ? "Edit Item" : "Add Item")
+            .navigationTitle(isEditing ? "Ubah Barang" : "Tambah Barang")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Batalkan") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save() }
+                    Button("Simpan") { save() }
                         .disabled(!isValid)
                 }
             }

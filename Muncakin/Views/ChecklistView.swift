@@ -9,6 +9,7 @@ struct ChecklistView: View {
 
     @State private var showAddItem = false
     @State private var itemToEdit: GearItem?
+    @State private var showDeleteConfirmation = false
 
     private var packedCount: Int {
         trip.generatedList.filter(\.isPacked).count
@@ -78,7 +79,7 @@ struct ChecklistView: View {
             // Delete trip button
             Section {
                 Button(role: .destructive) {
-                    deleteTrip()
+                    showDeleteConfirmation = true
                 } label: {
                     HStack {
                         Spacer()
@@ -104,6 +105,17 @@ struct ChecklistView: View {
         }
         .sheet(item: $itemToEdit) { item in
             ItemFormView(existingItem: item)
+        }
+        .confirmationDialog(
+            "Delete this trip?",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Trip", role: .destructive) {
+                deleteTrip()
+            }
+        } message: {
+            Text("This will permanently remove the trip and all its gear items.")
         }
     }
 
@@ -174,8 +186,8 @@ private struct PriorityTag: View {
 
     private var color: Color {
         switch priority {
-        case .mandatory: .red
-        case .optional: .blue
+        case .wajib: .red
+        case .opsional: .blue
         }
     }
 
