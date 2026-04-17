@@ -3,8 +3,8 @@
 import Foundation
 
 enum ItemOwnership: String, Codable, CaseIterable, Identifiable {
-    case personal
-    case loaned
+    case pribadi
+    case sewa
 
     var id: String { rawValue }
 }
