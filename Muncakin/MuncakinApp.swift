@@ -12,7 +12,9 @@ import SwiftData
 struct MuncakinApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Mountain.self,
+            GearItem.self,
+            Trip.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

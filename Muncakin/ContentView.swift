@@ -1,61 +1,47 @@
-//
-//  ContentView.swift
-//  Muncakin
-//
-//  Created by Darren Christian Liharja on 18/04/26.
-//
+// Views/ContentView.swift
 
 import SwiftUI
 import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query private var trips: [Trip]
+
+    @State private var showSplash = true
+    @State private var showAddTrip = false
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        ZStack {
+            if showSplash {
+                SplashView()
+                    .transition(.opacity)
+            } else if trips.isEmpty {
+                ContentUnavailableView {
+                    Label("No Trips", systemImage: "mountain.2")
+                } description: {
+                    Text("Plan your first hike by creating a trip.")
+                } actions: {
+                    Button("Create Trip") {
+                        showAddTrip = true
                     }
+                    .buttonStyle(.borderedProminent)
                 }
-                .onDelete(perform: deleteItems)
+            } else {
+                ChecklistView(trip: trips.first!)
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
+        .animation(.easeInOut, value: showSplash)
+        .task {
+            try? await Task.sleep(for: .seconds(1.5))
+            showSplash = false
         }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+        .sheet(isPresented: $showAddTrip) {
+            AddTripView()
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: Trip.self, inMemory: true)
 }
