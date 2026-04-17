@@ -49,6 +49,11 @@ struct AddTripView: View {
         }
     }
 
+    private var durationDays: Int {
+        let days = Calendar.current.dateComponents([.day], from: startDate, to: endDate).day ?? 0
+        return days + 1
+    }
+
     var body: some View {
         Form {
             Section("Destinasi") {
@@ -77,6 +82,12 @@ struct AddTripView: View {
             Section("Schedule") {
                 DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
                 DatePicker("End Date", selection: $endDate, in: startDate..., displayedComponents: .date)
+                HStack {
+                    Text("Duration")
+                    Spacer()
+                    Text("\(durationDays) day\(durationDays == 1 ? "" : "s")")
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Section("Group") {
@@ -157,9 +168,9 @@ private struct MountainPickerView: View {
                 }
             }
         }
-        .navigationTitle("Select Mountain")
+        .navigationTitle("Pilih Gunung")
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, prompt: "Search mountains")
+        .searchable(text: $searchText, prompt: "Cari Gunung")
     }
 }
 
