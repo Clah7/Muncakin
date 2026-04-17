@@ -12,6 +12,8 @@ final class GearItem {
     var priority: ItemPriority
     var ownership: ItemOwnership
     var isPacked: Bool
+    var quantity: Double
+    var unit: MeasurementUnit
 
     @Relationship(inverse: \Trip.generatedList)
     var trips: [Trip]?
@@ -22,7 +24,9 @@ final class GearItem {
         triggerCondition: GearCondition,
         priority: ItemPriority,
         ownership: ItemOwnership,
-        isPacked: Bool = false
+        isPacked: Bool = false,
+        quantity: Double = 1,
+        unit: MeasurementUnit = .pcs
     ) {
         self.id = UUID()
         self.name = name
@@ -31,5 +35,7 @@ final class GearItem {
         self.priority = priority
         self.ownership = ownership
         self.isPacked = isPacked
+        self.quantity = quantity
+        self.unit = unit
     }
 }

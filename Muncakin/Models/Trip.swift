@@ -8,15 +8,19 @@ final class Trip {
     @Attribute(.unique) var id: UUID
     var mountain: Mountain?
     var startDate: Date
-    var durationDays: Int
+    var endDate: Date
     var numberOfPeople: Int
     @Relationship var generatedList: [GearItem]
     var isPacked: Bool
 
+    var durationDays: Int {
+        Calendar.current.dateComponents([.day], from: startDate, to: endDate).day ?? 1
+    }
+
     init(
         mountain: Mountain,
         startDate: Date,
-        durationDays: Int,
+        endDate: Date,
         numberOfPeople: Int = 1,
         generatedList: [GearItem] = [],
         isPacked: Bool = false
@@ -24,7 +28,7 @@ final class Trip {
         self.id = UUID()
         self.mountain = mountain
         self.startDate = startDate
-        self.durationDays = durationDays
+        self.endDate = endDate
         self.numberOfPeople = numberOfPeople
         self.generatedList = generatedList
         self.isPacked = isPacked
