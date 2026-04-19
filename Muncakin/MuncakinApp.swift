@@ -25,6 +25,10 @@ struct MuncakinApp: App {
         }
     }()
 
+    init() {
+        Theme.configureNavigationBarAppearance()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

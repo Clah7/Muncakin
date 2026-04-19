@@ -19,19 +19,25 @@ struct ContentView: View {
                         if trips.isEmpty {
                             ContentUnavailableView {
                                 Label("No Trips", systemImage: "mountain.2")
+                                    .foregroundStyle(.muncakinPrimary)
                             } description: {
                                 Text("Plan your first hike by creating a trip.")
+                                    .foregroundStyle(.muncakinSecondary)
                             } actions: {
-                                NavigationLink("Create Trip") {
+                                NavigationLink {
                                     AddTripView()
+                                } label: {
+                                    Text("Create Trip")
+                                        .primaryCTAStyle()
                                 }
-                                .buttonStyle(.borderedProminent)
+                                .frame(maxWidth: 260)
                             }
                         } else {
                             ChecklistView(trip: trips.first!)
                         }
                     }
                 }
+                .tint(.muncakinPrimary)
             }
         }
         .animation(.easeInOut, value: showSplash)
