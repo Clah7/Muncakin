@@ -69,11 +69,11 @@ struct AddTripView: View {
                         Spacer()
                         if let mountain = selectedMountain {
                             Text(mountain.name)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.muncakinSecondary)
                             GradeTag(grade: mountain.grade)
                         } else {
                             Text("Pilih")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.muncakinSecondary)
                         }
                     }
                 }
@@ -86,7 +86,7 @@ struct AddTripView: View {
                     Text("Duration")
                     Spacer()
                     Text("\(durationDays) day\(durationDays == 1 ? "" : "s")")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.muncakinSecondary)
                 }
             }
 
@@ -95,11 +95,15 @@ struct AddTripView: View {
             }
 
             Section {
-                Button("Tambah Pendakian") {
+                Button {
                     createTrip()
+                } label: {
+                    Text("Tambah Pendakian")
+                        .primaryCTAStyle(isDisabled: selectedMountain == nil)
                 }
-                .frame(maxWidth: .infinity)
                 .disabled(selectedMountain == nil)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
             }
         }
         .navigationTitle("Pendakian Baru")
@@ -149,23 +153,31 @@ private struct MountainPickerView: View {
                 dismiss()
             } label: {
                 HStack {
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 6) {
                         HStack(spacing: 8) {
                             Text(mountain.name)
+                                .font(.body.weight(.medium))
                                 .foregroundStyle(.primary)
                             GradeTag(grade: mountain.grade)
                         }
-                        Text("\(mountain.altitude)m · \(mountain.terrain.rawValue.capitalized)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption2)
+                            Text("\(mountain.altitude)m")
+                            Text("·")
+                            Text(mountain.terrain.rawValue.capitalized)
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.muncakinSecondary)
                     }
                     Spacer()
                     if selection?.name == mountain.name {
                         Image(systemName: "checkmark")
-                            .foregroundStyle(.tint)
+                            .foregroundStyle(.muncakinPrimary)
                             .fontWeight(.semibold)
                     }
                 }
+                .padding(.vertical, 4)
             }
         }
         .navigationTitle("Pilih Gunung")
@@ -181,10 +193,10 @@ private struct GradeTag: View {
 
     private var color: Color {
         switch grade {
-        case "Easy": .green
+        case "Easy": .muncakinPrimary
         case "Medium": .orange
         case "Hard": .red
-        default: .secondary
+        default: .muncakinSecondary
         }
     }
 
@@ -192,11 +204,11 @@ private struct GradeTag: View {
         Text(grade)
             .font(.caption2)
             .fontWeight(.semibold)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
             .background(color.opacity(0.15))
             .foregroundStyle(color)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 }
 

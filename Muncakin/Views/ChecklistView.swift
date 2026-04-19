@@ -33,21 +33,24 @@ struct ChecklistView: View {
 
     var body: some View {
         List {
-            // Progress section
+            // Progress card
             Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "mountain.2.fill")
+                            .foregroundStyle(.muncakinPrimary)
                         Text(trip.mountain?.name ?? "Unknown Mountain")
                             .font(.headline)
                         Spacer()
-                        Text("\(packedCount)/\(totalCount) packed")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        Text("\(packedCount)/\(totalCount)")
+                            .font(.caption.weight(.semibold))
+                            .monospacedDigit()
+                            .foregroundStyle(.muncakinSecondary)
                     }
                     ProgressView(value: progress)
-                        .tint(progress == 1.0 ? .green : .accentColor)
+                        .tint(progress == 1.0 ? .green : .muncakinPrimary)
                 }
-                .padding(.vertical, 4)
+                .padding(.vertical, 6)
             }
 
             // Gear items grouped by category
@@ -76,18 +79,16 @@ struct ChecklistView: View {
                 }
             }
 
-            // Delete trip button
+            // Delete trip CTA
             Section {
-                Button(role: .destructive) {
+                Button {
                     showDeleteConfirmation = true
                 } label: {
-                    HStack {
-                        Spacer()
-                        Text("Delete Trip")
-                            .fontWeight(.semibold)
-                        Spacer()
-                    }
+                    Text("Delete Trip")
+                        .destructiveCTAStyle()
                 }
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
             }
         }
         .navigationTitle("Checklist")
@@ -154,28 +155,31 @@ private struct GearItemRow: View {
     }
 
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
             Toggle(isOn: $item.isPacked) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 5) {
                     Text(item.name)
-                        .strikethrough(item.isPacked, color: .secondary)
-                        .foregroundStyle(item.isPacked ? .secondary : .primary)
+                        .font(.body)
+                        .strikethrough(item.isPacked, color: .muncakinSecondary)
+                        .foregroundStyle(item.isPacked ? .muncakinSecondary : .primary)
 
                     HStack(spacing: 8) {
-                        Text(quantityLabel)
+                        Label(quantityLabel, systemImage: "scalemass")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.muncakinSecondary)
 
                         PriorityTag(priority: item.priority)
                     }
                 }
             }
             .toggleStyle(.switch)
+            .tint(.muncakinPrimary)
 
             Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.muncakinSecondary.opacity(0.5))
         }
+        .padding(.vertical, 4)
     }
 }
 
@@ -187,7 +191,7 @@ private struct PriorityTag: View {
     private var color: Color {
         switch priority {
         case .wajib: .red
-        case .opsional: .blue
+        case .opsional: .muncakinPrimary
         }
     }
 
@@ -195,11 +199,11 @@ private struct PriorityTag: View {
         Text(priority.rawValue.capitalized)
             .font(.caption2)
             .fontWeight(.medium)
-            .padding(.horizontal, 5)
-            .padding(.vertical, 1)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
             .background(color.opacity(0.12))
             .foregroundStyle(color)
-            .clipShape(RoundedRectangle(cornerRadius: 3))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
     }
 }
 

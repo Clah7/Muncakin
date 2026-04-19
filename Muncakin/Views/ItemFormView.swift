@@ -60,16 +60,24 @@ struct ItemFormView: View {
                         }
                     }
                 }
+
+                Section {
+                    Button {
+                        save()
+                    } label: {
+                        Text("Simpan")
+                            .primaryCTAStyle(isDisabled: !isValid)
+                    }
+                    .disabled(!isValid)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+                }
             }
             .navigationTitle(isEditing ? "Ubah Barang" : "Tambah Barang")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Batalkan") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Simpan") { save() }
-                        .disabled(!isValid)
                 }
             }
             .onAppear {
@@ -83,6 +91,7 @@ struct ItemFormView: View {
                 }
             }
         }
+        .tint(.muncakinPrimary)
     }
 
     private func save() {

@@ -8,18 +8,20 @@ struct SplashView: View {
             Color(.systemBackground)
                 .ignoresSafeArea()
 
-            VStack(spacing: 20) {
-                Image(systemName: "mountain.2.fill")
-                    .font(.system(size: 72))
-                    .foregroundStyle(.tint)
+            VStack(spacing: 24) {
+                Image("img_logo")
+                    .resizable()
+                    .frame(width: 256, height: 96)
 
-                Text("Muncakin")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+                VStack(spacing: 8) {
+                    Text("Muncakin")
+                        .font(.serifTitle(.largeTitle, weight: .bold))
 
-                Text("Lebih baik sakit kaki daripada sakit hati")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    Text("Lebih baik sakit kaki daripada sakit hati")
+                        .font(.system(.subheadline, design: .serif))
+                        .italic(true)
+                        .foregroundStyle(.muncakinSecondary)
+                }
             }
         }
     }
