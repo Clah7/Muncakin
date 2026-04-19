@@ -151,8 +151,11 @@ private struct MountainPickerView: View {
         ScrollView {
             LazyVStack(spacing: Theme.cardSpacing) {
                 ForEach(mountains) { mountain in
-                    MountainCard(
-                        mountain: mountain,
+                    MountainSelectionCard(
+                        name: mountain.name,
+                        altitude: mountain.altitude,
+                        terrain: mountain.terrain,
+                        grade: mountain.grade,
                         isSelected: selection?.name == mountain.name
                     ) {
                         selection = mountain
@@ -167,86 +170,6 @@ private struct MountainPickerView: View {
         .navigationTitle("Pilih Gunung")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, prompt: "Cari Gunung")
-    }
-}
-
-// MARK: - Mountain Card
-
-private struct MountainCard: View {
-    let mountain: MockMountain
-    let isSelected: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 14) {
-                // Mountain icon
-                Image(systemName: "mountain.2.fill")
-                    .font(.title3)
-                    .foregroundStyle(.muncakinPrimary)
-                    .frame(width: 36)
-
-                // Info
-                VStack(alignment: .leading, spacing: 5) {
-                    HStack(spacing: 8) {
-                        Text(mountain.name)
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(.primary)
-                        GradeTag(grade: mountain.grade)
-                    }
-
-                    HStack(spacing: 12) {
-                        Label("\(mountain.altitude)m", systemImage: "arrow.up.right")
-                        Label(mountain.terrain.rawValue.capitalized, systemImage: "leaf")
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.muncakinSecondary)
-                }
-
-                Spacer()
-
-                if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.muncakinPrimary)
-                }
-            }
-        }
-        .floatingCard()
-        .overlay {
-            if isSelected {
-                RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
-                    .strokeBorder(Color.muncakinPrimary, lineWidth: 2)
-            }
-        }
-    }
-}
-
-// MARK: - Grade Tag
-
-private struct GradeTag: View {
-    let grade: String
-
-    private var color: Color {
-        switch grade {
-        case "Grade 1": .muncakinPrimary
-        case "Grade 2": .yellow
-        case "Grade 3": .yellow
-        case "Grade 4": .orange
-        case "Grade 5": .red
-        default: .muncakinSecondary
-        }
-    }
-
-    var body: some View {
-        Text(grade)
-            .font(.caption2)
-            .fontWeight(.semibold)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .background(color.opacity(0.15))
-            .foregroundStyle(color)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 }
 

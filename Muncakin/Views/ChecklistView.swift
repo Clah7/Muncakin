@@ -85,8 +85,9 @@ struct ChecklistView: View {
             Text("This will permanently remove the trip and all its gear items.")
         }
     }
-// MARK: - Progress Card
-    
+
+    // MARK: - Progress Card
+
     private var progressCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
@@ -116,7 +117,7 @@ struct ChecklistView: View {
         .floatingCard()
     }
 
-// MARK: - Empty State
+    // MARK: - Empty State
 
     private var emptyState: some View {
         VStack(spacing: 12) {
@@ -149,7 +150,7 @@ struct ChecklistView: View {
                 // Items card — all items in one card per category
                 VStack(spacing: 0) {
                     ForEach(Array(group.items.enumerated()), id: \.element.id) { index, item in
-                        GearItemRow(item: item) {
+                        GearItemCard(item: item) {
                             itemToEdit = item
                         } onDelete: {
                             deleteItem(item)
@@ -166,7 +167,7 @@ struct ChecklistView: View {
         }
     }
 
-// MARK: - Actions
+    // MARK: - Actions
 
     private func deleteItem(_ item: GearItem) {
         withAnimation {
@@ -183,91 +184,6 @@ struct ChecklistView: View {
             modelContext.delete(mountain)
         }
         modelContext.delete(trip)
-    }
-}
-
-// MARK: - Gear Item Row
-
-private struct GearItemRow: View {
-    @Bindable var item: GearItem
-    let onEdit: () -> Void
-    let onDelete: () -> Void
-
-    private var quantityLabel: String {
-        let formatted = item.quantity.truncatingRemainder(dividingBy: 1) == 0
-            ? String(format: "%.0f", item.quantity)
-            : String(format: "%.1f", item.quantity)
-        return "\(formatted) \(item.unit.abbreviation)"
-    }
-
-    var body: some View {
-        HStack(spacing: 12) {
-            // Checkbox
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    item.isPacked.toggle()
-                }
-            } label: {
-                Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
-                    .foregroundStyle(item.isPacked ? .muncakinPrimary : .muncakinSecondary.opacity(0.4))
-            }
-            .buttonStyle(.plain)
-
-            // Content — tappable to edit
-            Button(action: onEdit) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(item.name)
-                        .font(.body)
-                        .strikethrough(item.isPacked, color: .muncakinSecondary)
-                        .foregroundStyle(item.isPacked ? .muncakinSecondary : .primary)
-
-                    HStack(spacing: 8) {
-                        Label(quantityLabel, systemImage: "scalemass")
-                            .font(.caption)
-                            .foregroundStyle(.muncakinSecondary)
-
-                        PriorityTag(priority: item.priority)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(.plain)
-
-            // Delete
-            Button(role: .destructive, action: onDelete) {
-                Image(systemName: "trash")
-                    .font(.caption)
-                    .foregroundStyle(.red.opacity(0.6))
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.vertical, 10)
-        .contentShape(Rectangle())
-    }
-}
-
-// MARK: - Priority Tag
-
-private struct PriorityTag: View {
-    let priority: ItemPriority
-
-    private var color: Color {
-        switch priority {
-        case .wajib: .red
-        case .opsional: .muncakinPrimary
-        }
-    }
-
-    var body: some View {
-        Text(priority.rawValue.capitalized)
-            .font(.caption2)
-            .fontWeight(.medium)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(color.opacity(0.12))
-            .foregroundStyle(color)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
     }
 }
 
