@@ -35,6 +35,7 @@ struct ItemFormView: View {
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
+                            .foregroundStyle(.muncakinPrimary)
                     }
                     Picker("Satuan", selection: $unit) {
                         ForEach(MeasurementUnit.allCases) { u in
@@ -78,6 +79,7 @@ struct ItemFormView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Batalkan") { dismiss() }
+                        .tint(.red)
                 }
             }
             .onAppear {

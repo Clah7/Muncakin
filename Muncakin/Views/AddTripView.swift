@@ -18,14 +18,14 @@ private struct MockMountain: Identifiable, Equatable {
 }
 
 private let allMockMountains: [MockMountain] = [
-    MockMountain(name: "Mt. Rinjani", altitude: 3726, terrain: .volcanic, grade: "Hard"),
-    MockMountain(name: "Mt. Semeru", altitude: 3676, terrain: .jungle, grade: "Hard"),
-    MockMountain(name: "Mt. Bromo", altitude: 2329, terrain: .volcanic, grade: "Easy"),
-    MockMountain(name: "Mt. Merbabu", altitude: 3145, terrain: .alpine, grade: "Medium"),
-    MockMountain(name: "Mt. Prau", altitude: 2590, terrain: .rocky, grade: "Easy"),
-    MockMountain(name: "Mt. Ciremai", altitude: 3078, terrain: .jungle, grade: "Medium"),
-    MockMountain(name: "Mt. Kerinci", altitude: 3805, terrain: .jungle, grade: "Hard"),
-    MockMountain(name: "Mt. Papandayan", altitude: 2665, terrain: .volcanic, grade: "Easy"),
+    MockMountain(name: "Mt. Rinjani", altitude: 3726, terrain: .volcanic, grade: "Grade 4"),
+    MockMountain(name: "Mt. Semeru", altitude: 3676, terrain: .jungle, grade: "Grade 4"),
+    MockMountain(name: "Mt. Bromo", altitude: 2329, terrain: .volcanic, grade: "Grade 1"),
+    MockMountain(name: "Mt. Merbabu", altitude: 3145, terrain: .alpine, grade: "Grade 2"),
+    MockMountain(name: "Mt. Prau", altitude: 2590, terrain: .rocky, grade: "Grade 1"),
+    MockMountain(name: "Mt. Ciremai", altitude: 3078, terrain: .jungle, grade: "Grade 3"),
+    MockMountain(name: "Mt. Kerinci", altitude: 3805, terrain: .jungle, grade: "Grade 4"),
+    MockMountain(name: "Mt. Papandayan", altitude: 2665, terrain: .volcanic, grade: "Grade 2"),
 ]
 
 // MARK: - AddTripView
@@ -69,11 +69,11 @@ struct AddTripView: View {
                         Spacer()
                         if let mountain = selectedMountain {
                             Text(mountain.name)
-                                .foregroundStyle(.muncakinSecondary)
+                                .foregroundStyle(.muncakinPrimary)
                             GradeTag(grade: mountain.grade)
                         } else {
                             Text("Pilih")
-                                .foregroundStyle(.muncakinSecondary)
+                                .foregroundStyle(.muncakinPrimary)
                         }
                     }
                 }
@@ -81,12 +81,13 @@ struct AddTripView: View {
 
             Section("Schedule") {
                 DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                    .tint(.muncakinPrimary)
                 DatePicker("End Date", selection: $endDate, in: startDate..., displayedComponents: .date)
+                    .tint(.muncakinPrimary)
                 HStack {
                     Text("Duration")
                     Spacer()
                     Text("\(durationDays) day\(durationDays == 1 ? "" : "s")")
-                        .foregroundStyle(.muncakinSecondary)
                 }
             }
 
@@ -138,7 +139,7 @@ struct AddTripView: View {
     }
 }
 
-// MARK: - Mountain Picker
+// MARK: - Mountain Picker (Floating Cards)
 
 private struct MountainPickerView: View {
     let mountains: [MockMountain]
@@ -147,42 +148,77 @@ private struct MountainPickerView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        List(mountains) { mountain in
-            Button {
-                selection = mountain
-                dismiss()
-            } label: {
-                HStack {
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(spacing: 8) {
-                            Text(mountain.name)
-                                .font(.body.weight(.medium))
-                                .foregroundStyle(.primary)
-                            GradeTag(grade: mountain.grade)
-                        }
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.up.right")
-                                .font(.caption2)
-                            Text("\(mountain.altitude)m")
-                            Text("·")
-                            Text(mountain.terrain.rawValue.capitalized)
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.muncakinSecondary)
-                    }
-                    Spacer()
-                    if selection?.name == mountain.name {
-                        Image(systemName: "checkmark")
-                            .foregroundStyle(.muncakinPrimary)
-                            .fontWeight(.semibold)
+        ScrollView {
+            LazyVStack(spacing: Theme.cardSpacing) {
+                ForEach(mountains) { mountain in
+                    MountainCard(
+                        mountain: mountain,
+                        isSelected: selection?.name == mountain.name
+                    ) {
+                        selection = mountain
+                        dismiss()
                     }
                 }
-                .padding(.vertical, 4)
             }
+            .padding(.horizontal, Theme.screenPadding)
+            .padding(.vertical, 8)
         }
+        .background(Color.muncakinScreenBackground.ignoresSafeArea())
         .navigationTitle("Pilih Gunung")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, prompt: "Cari Gunung")
+    }
+}
+
+// MARK: - Mountain Card
+
+private struct MountainCard: View {
+    let mountain: MockMountain
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 14) {
+                // Mountain icon
+                Image(systemName: "mountain.2.fill")
+                    .font(.title3)
+                    .foregroundStyle(.muncakinPrimary)
+                    .frame(width: 36)
+
+                // Info
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(spacing: 8) {
+                        Text(mountain.name)
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        GradeTag(grade: mountain.grade)
+                    }
+
+                    HStack(spacing: 12) {
+                        Label("\(mountain.altitude)m", systemImage: "arrow.up.right")
+                        Label(mountain.terrain.rawValue.capitalized, systemImage: "leaf")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.muncakinSecondary)
+                }
+
+                Spacer()
+
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.muncakinPrimary)
+                }
+            }
+        }
+        .floatingCard()
+        .overlay {
+            if isSelected {
+                RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
+                    .strokeBorder(Color.muncakinPrimary, lineWidth: 2)
+            }
+        }
     }
 }
 
@@ -193,9 +229,11 @@ private struct GradeTag: View {
 
     private var color: Color {
         switch grade {
-        case "Easy": .muncakinPrimary
-        case "Medium": .orange
-        case "Hard": .red
+        case "Grade 1": .muncakinPrimary
+        case "Grade 2": .yellow
+        case "Grade 3": .yellow
+        case "Grade 4": .orange
+        case "Grade 5": .red
         default: .muncakinSecondary
         }
     }

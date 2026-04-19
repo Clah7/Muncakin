@@ -21,7 +21,7 @@ struct ContentView: View {
                                 Label("No Trips", systemImage: "mountain.2")
                                     .foregroundStyle(.muncakinPrimary)
                             } description: {
-                                Text("Plan your first hike by creating a trip.")
+                                Text("Ayo Rencanakan Pendakianmu")
                                     .foregroundStyle(.muncakinSecondary)
                             } actions: {
                                 NavigationLink {

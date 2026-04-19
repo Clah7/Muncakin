@@ -32,65 +32,31 @@ struct ChecklistView: View {
     }
 
     var body: some View {
-        List {
-            // Progress card
-            Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack(spacing: 10) {
-                        Image(systemName: "mountain.2.fill")
-                            .foregroundStyle(.muncakinPrimary)
-                        Text(trip.mountain?.name ?? "Unknown Mountain")
-                            .font(.headline)
-                        Spacer()
-                        Text("\(packedCount)/\(totalCount)")
-                            .font(.caption.weight(.semibold))
-                            .monospacedDigit()
-                            .foregroundStyle(.muncakinSecondary)
-                    }
-                    ProgressView(value: progress)
-                        .tint(progress == 1.0 ? .green : .muncakinPrimary)
-                }
-                .padding(.vertical, 6)
-            }
+        ScrollView {
+            LazyVStack(spacing: Theme.cardSpacing) {
+                // Progress card
+                progressCard
 
-            // Gear items grouped by category
-            if trip.generatedList.isEmpty {
-                Section {
-                    ContentUnavailableView(
-                        "No Items Yet",
-                        systemImage: "backpack",
-                        description: Text("Tap + to add gear to your list.")
-                    )
+                // Gear items
+                if trip.generatedList.isEmpty {
+                    emptyState
+                } else {
+                    gearCards
                 }
-            } else {
-                ForEach(groupedItems, id: \.category) { group in
-                    Section(group.category.rawValue.capitalized) {
-                        ForEach(group.items) { item in
-                            GearItemRow(item: item)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    itemToEdit = item
-                                }
-                        }
-                        .onDelete { offsets in
-                            deleteItems(in: group.category, at: offsets)
-                        }
-                    }
-                }
-            }
 
-            // Delete trip CTA
-            Section {
+                // Delete trip CTA
                 Button {
                     showDeleteConfirmation = true
                 } label: {
                     Text("Delete Trip")
                         .destructiveCTAStyle()
                 }
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
+                .padding(.top, 8)
             }
+            .padding(.horizontal, Theme.screenPadding)
+            .padding(.vertical, 8)
         }
+        .background(Color.muncakinScreenBackground.ignoresSafeArea())
         .navigationTitle("Checklist")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -119,15 +85,93 @@ struct ChecklistView: View {
             Text("This will permanently remove the trip and all its gear items.")
         }
     }
+// MARK: - Progress Card
+    
+    private var progressCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "mountain.2.fill")
+                    .font(.title3)
+                    .foregroundStyle(.muncakinPrimary)
 
-    private func deleteItems(in category: GearCategory, at offsets: IndexSet) {
-        let categoryItems = trip.generatedList.filter { $0.category == category }
-        withAnimation {
-            for index in offsets {
-                let item = categoryItems[index]
-                trip.generatedList.removeAll { $0.id == item.id }
-                modelContext.delete(item)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(trip.mountain?.name ?? "Unknown Mountain")
+                        .font(.headline)
+                    Text("\(trip.durationDays) day\(trip.durationDays == 1 ? "" : "s") · \(trip.numberOfPeople) \(trip.numberOfPeople == 1 ? "person" : "people")")
+                        .font(.caption)
+                        .foregroundStyle(.muncakinSecondary)
+                }
+
+                Spacer()
+
+                Text("\(packedCount)/\(totalCount)")
+                    .font(.subheadline.weight(.bold))
+                    .monospacedDigit()
+                    .foregroundStyle(.muncakinPrimary)
             }
+
+            ProgressView(value: progress)
+                .tint(progress == 1.0 ? .green : .muncakinPrimary)
+        }
+        .floatingCard()
+    }
+
+// MARK: - Empty State
+
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "backpack")
+                .font(.largeTitle)
+                .foregroundStyle(.muncakinSecondary)
+            Text("No Items Yet")
+                .font(.headline)
+            Text("Tap + to add gear to your list.")
+                .font(.subheadline)
+                .foregroundStyle(.muncakinSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+        .floatingCard()
+    }
+
+    // MARK: - Gear Cards
+
+    private var gearCards: some View {
+        ForEach(groupedItems, id: \.category) { group in
+            VStack(alignment: .leading, spacing: 0) {
+                // Category header
+                Text(group.category.rawValue.capitalized)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.muncakinSecondary)
+                    .padding(.leading, 4)
+                    .padding(.bottom, 8)
+
+                // Items card — all items in one card per category
+                VStack(spacing: 0) {
+                    ForEach(Array(group.items.enumerated()), id: \.element.id) { index, item in
+                        GearItemRow(item: item) {
+                            itemToEdit = item
+                        } onDelete: {
+                            deleteItem(item)
+                        }
+
+                        if index < group.items.count - 1 {
+                            Divider()
+                                .padding(.leading, 44)
+                        }
+                    }
+                }
+                .floatingCard()
+            }
+        }
+    }
+
+// MARK: - Actions
+
+    private func deleteItem(_ item: GearItem) {
+        withAnimation {
+            trip.generatedList.removeAll { $0.id == item.id }
+            modelContext.delete(item)
         }
     }
 
@@ -146,6 +190,8 @@ struct ChecklistView: View {
 
 private struct GearItemRow: View {
     @Bindable var item: GearItem
+    let onEdit: () -> Void
+    let onDelete: () -> Void
 
     private var quantityLabel: String {
         let formatted = item.quantity.truncatingRemainder(dividingBy: 1) == 0
@@ -156,8 +202,21 @@ private struct GearItemRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Toggle(isOn: $item.isPacked) {
-                VStack(alignment: .leading, spacing: 5) {
+            // Checkbox
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    item.isPacked.toggle()
+                }
+            } label: {
+                Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(item.isPacked ? .muncakinPrimary : .muncakinSecondary.opacity(0.4))
+            }
+            .buttonStyle(.plain)
+
+            // Content — tappable to edit
+            Button(action: onEdit) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(item.name)
                         .font(.body)
                         .strikethrough(item.isPacked, color: .muncakinSecondary)
@@ -171,15 +230,20 @@ private struct GearItemRow: View {
                         PriorityTag(priority: item.priority)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .toggleStyle(.switch)
-            .tint(.muncakinPrimary)
+            .buttonStyle(.plain)
 
-            Image(systemName: "chevron.right")
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.muncakinSecondary.opacity(0.5))
+            // Delete
+            Button(role: .destructive, action: onDelete) {
+                Image(systemName: "trash")
+                    .font(.caption)
+                    .foregroundStyle(.red.opacity(0.6))
+            }
+            .buttonStyle(.plain)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 10)
+        .contentShape(Rectangle())
     }
 }
 

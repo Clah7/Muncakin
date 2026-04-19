@@ -17,10 +17,16 @@ extension Color {
         dark: Color(red: 0.61, green: 0.64, blue: 0.69)
     )
 
-    /// Card background — subtle off-white / dark-gray
+    /// Card surface — white in light, elevated gray in dark
     static let muncakinCardBackground = Color(
         light: Color(.systemBackground),
         dark: Color(.secondarySystemBackground)
+    )
+
+    /// Screen background — subtle gray in light, true black-ish in dark
+    static let muncakinScreenBackground = Color(
+        light: Color(.systemGroupedBackground),
+        dark: Color(.systemBackground)
     )
 }
 
@@ -46,9 +52,11 @@ extension Font {
 // MARK: - Navigation Bar Appearance
 
 enum Theme {
-    static let cornerRadius: CGFloat = 12
+    static let cardRadius: CGFloat = 16
+    static let cardPadding: CGFloat = 16
+    static let screenPadding: CGFloat = 16
+    static let cardSpacing: CGFloat = 12
 
-    /// Call once at app launch to apply serif font to all navigation bar large titles
     static func configureNavigationBarAppearance() {
         let largeTitleAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(
@@ -71,16 +79,30 @@ enum Theme {
     }
 }
 
-// MARK: - View Modifiers
+// MARK: - Floating Card Modifier
 
-struct CardStyle: ViewModifier {
+struct FloatingCard: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+
     func body(content: Content) -> some View {
         content
-            .padding(14)
-            .background(.regularMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius))
+            .padding(Theme.cardPadding)
+            .background(Color.muncakinCardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
+            .overlay {
+                if colorScheme == .dark {
+                    RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                }
+            }
+            .shadow(
+                color: colorScheme == .light ? .black.opacity(0.05) : .clear,
+                radius: 8, x: 0, y: 4
+            )
     }
 }
+
+// MARK: - CTA Modifiers
 
 struct PrimaryCTAStyle: ViewModifier {
     let isDisabled: Bool
@@ -108,9 +130,11 @@ struct DestructiveCTAStyle: ViewModifier {
     }
 }
 
+// MARK: - View Extensions
+
 extension View {
-    func cardStyle() -> some View {
-        modifier(CardStyle())
+    func floatingCard() -> some View {
+        modifier(FloatingCard())
     }
 
     func primaryCTAStyle(isDisabled: Bool = false) -> some View {
@@ -128,4 +152,5 @@ extension ShapeStyle where Self == Color {
     static var muncakinPrimary: Color { Color.muncakinPrimary }
     static var muncakinSecondary: Color { Color.muncakinSecondary }
     static var muncakinCardBackground: Color { Color.muncakinCardBackground }
+    static var muncakinScreenBackground: Color { Color.muncakinScreenBackground }
 }
