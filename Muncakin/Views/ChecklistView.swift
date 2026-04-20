@@ -48,7 +48,7 @@ struct ChecklistView: View {
                 Button {
                     showDeleteConfirmation = true
                 } label: {
-                    Text("Delete Trip")
+                    Text("Selesaikan Pendakian")
                         .destructiveCTAStyle()
                 }
                 .padding(.top, 8)
@@ -57,7 +57,7 @@ struct ChecklistView: View {
             .padding(.vertical, 8)
         }
         .background(Color.muncakinScreenBackground.ignoresSafeArea())
-        .navigationTitle("Checklist")
+        .navigationTitle("List Barang")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -74,15 +74,15 @@ struct ChecklistView: View {
             ItemFormView(existingItem: item)
         }
         .confirmationDialog(
-            "Delete this trip?",
+            "Selesaikan Pendakian?",
             isPresented: $showDeleteConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Delete Trip", role: .destructive) {
+            Button("Selesaikan Pendakian", role: .destructive) {
                 deleteTrip()
             }
         } message: {
-            Text("This will permanently remove the trip and all its gear items.")
+            Text("Hal ini akan menghapus seluruh data pendakian dan list barang yang telah disimpan")
         }
     }
 
@@ -92,8 +92,7 @@ struct ChecklistView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 Image(systemName: "mountain.2.fill")
-                    .font(.title3)
-                    .foregroundStyle(.muncakinPrimary)
+                    .font(.title)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(trip.mountain?.name ?? "Unknown Mountain")
@@ -124,9 +123,9 @@ struct ChecklistView: View {
             Image(systemName: "backpack")
                 .font(.largeTitle)
                 .foregroundStyle(.muncakinSecondary)
-            Text("No Items Yet")
+            Text("Belum ada barang")
                 .font(.headline)
-            Text("Tap + to add gear to your list.")
+            Text("Ketuk + untuk menambahkan barang.")
                 .font(.subheadline)
                 .foregroundStyle(.muncakinSecondary)
         }
