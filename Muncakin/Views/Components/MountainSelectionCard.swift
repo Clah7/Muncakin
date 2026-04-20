@@ -7,8 +7,11 @@ struct MountainSelectionCard: View {
     let altitude: Int
     let terrain: TerrainType
     let grade: String
+    let gradeExplanation: String
     let isSelected: Bool
     let onTap: () -> Void
+
+    @State private var showGradeInfo = false
 
     var body: some View {
         Button(action: onTap) {
@@ -25,6 +28,19 @@ struct MountainSelectionCard: View {
                         Text(name)
                             .font(.body.weight(.semibold))
                             .foregroundStyle(.primary)
+
+                        // Info icon — does NOT select the mountain
+                        Button {
+                            showGradeInfo = true
+                        } label: {
+                            Image(systemName: "info.circle")
+                                .font(.caption)
+                                .foregroundStyle(.muncakinSecondary)
+                        }
+                        .buttonStyle(.plain)
+
+                        Spacer()
+
                         GradeTag(grade: grade)
                     }
 
@@ -35,8 +51,6 @@ struct MountainSelectionCard: View {
                     .font(.caption)
                     .foregroundStyle(.muncakinSecondary)
                 }
-
-                Spacer()
 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
@@ -51,6 +65,11 @@ struct MountainSelectionCard: View {
                 RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
                     .strokeBorder(Color.muncakinPrimary, lineWidth: 2)
             }
+        }
+        .alert(grade, isPresented: $showGradeInfo) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(gradeExplanation)
         }
     }
 }

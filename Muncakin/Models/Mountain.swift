@@ -10,12 +10,14 @@ final class Mountain {
     var peakAltitude: Int
     var terrainType: TerrainType
     var grade: String
+    var gradeExplanation: String
 
-    init(name: String, peakAltitude: Int, terrainType: TerrainType, grade: String) {
+    init(name: String, peakAltitude: Int, terrainType: TerrainType, grade: String, gradeExplanation: String = "") {
         self.id = UUID()
         self.name = name
         self.peakAltitude = peakAltitude
         self.terrainType = terrainType
         self.grade = grade
+        self.gradeExplanation = gradeExplanation
     }
 }

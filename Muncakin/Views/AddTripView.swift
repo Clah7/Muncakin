@@ -11,6 +11,7 @@ private struct MockMountain: Identifiable, Equatable {
     let altitude: Int
     let terrain: TerrainType
     let grade: String
+    let gradeExplanation: String
 
     static func == (lhs: MockMountain, rhs: MockMountain) -> Bool {
         lhs.name == rhs.name
@@ -18,14 +19,14 @@ private struct MockMountain: Identifiable, Equatable {
 }
 
 private let allMockMountains: [MockMountain] = [
-    MockMountain(name: "Mt. Rinjani", altitude: 3726, terrain: .volcanic, grade: "Grade 4"),
-    MockMountain(name: "Mt. Semeru", altitude: 3676, terrain: .jungle, grade: "Grade 4"),
-    MockMountain(name: "Mt. Bromo", altitude: 2329, terrain: .volcanic, grade: "Grade 1"),
-    MockMountain(name: "Mt. Merbabu", altitude: 3145, terrain: .alpine, grade: "Grade 2"),
-    MockMountain(name: "Mt. Prau", altitude: 2590, terrain: .rocky, grade: "Grade 1"),
-    MockMountain(name: "Mt. Ciremai", altitude: 3078, terrain: .jungle, grade: "Grade 3"),
-    MockMountain(name: "Mt. Kerinci", altitude: 3805, terrain: .jungle, grade: "Grade 4"),
-    MockMountain(name: "Mt. Papandayan", altitude: 2665, terrain: .volcanic, grade: "Grade 2"),
+    MockMountain(name: "Mt. Rinjani", altitude: 3726, terrain: .volcanic, grade: "Grade 4", gradeExplanation: "Jalur sangat menantang dengan medan terjal, membutuhkan pengalaman mendaki dan peralatan lengkap."),
+    MockMountain(name: "Mt. Semeru", altitude: 3676, terrain: .jungle, grade: "Grade 4", gradeExplanation: "Pendakian panjang dan berat dengan risiko aktivitas vulkanik, hanya untuk pendaki berpengalaman."),
+    MockMountain(name: "Mt. Bromo", altitude: 2329, terrain: .volcanic, grade: "Grade 1", gradeExplanation: "Jalur mudah dan pendek, cocok untuk pemula dan wisatawan umum."),
+    MockMountain(name: "Mt. Merbabu", altitude: 3145, terrain: .alpine, grade: "Grade 2", gradeExplanation: "Jalur moderat dengan medan terbuka, cocok untuk pendaki dengan sedikit pengalaman."),
+    MockMountain(name: "Mt. Prau", altitude: 2590, terrain: .rocky, grade: "Grade 1", gradeExplanation: "Jalur pendek dan landai, sangat cocok untuk pendaki pemula."),
+    MockMountain(name: "Mt. Ciremai", altitude: 3078, terrain: .jungle, grade: "Grade 3", gradeExplanation: "Jalur cukup menantang dengan hutan lebat dan tanjakan curam, membutuhkan stamina baik."),
+    MockMountain(name: "Mt. Kerinci", altitude: 3805, terrain: .jungle, grade: "Grade 4", gradeExplanation: "Gunung tertinggi di Sumatera, jalur panjang dan berat menembus hutan tropis lebat."),
+    MockMountain(name: "Mt. Papandayan", altitude: 2665, terrain: .volcanic, grade: "Grade 2", gradeExplanation: "Jalur moderat dengan pemandangan kawah aktif, cocok untuk pendaki menengah."),
 ]
 
 // MARK: - AddTripView
@@ -123,7 +124,8 @@ struct AddTripView: View {
             name: data.name,
             peakAltitude: data.altitude,
             terrainType: data.terrain,
-            grade: data.grade
+            grade: data.grade,
+            gradeExplanation: data.gradeExplanation
         )
         modelContext.insert(mountain)
 
@@ -156,6 +158,7 @@ private struct MountainPickerView: View {
                         altitude: mountain.altitude,
                         terrain: mountain.terrain,
                         grade: mountain.grade,
+                        gradeExplanation: mountain.gradeExplanation,
                         isSelected: selection?.name == mountain.name
                     ) {
                         selection = mountain

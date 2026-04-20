@@ -37,12 +37,13 @@ struct GearItemCard: View {
                         .strikethrough(item.isPacked, color: .muncakinSecondary)
                         .foregroundStyle(item.isPacked ? .muncakinSecondary : .primary)
 
-                    HStack(spacing: 8) {
+                    HStack(spacing: 6) {
                         Label(quantityLabel, systemImage: "scalemass")
                             .font(.caption)
                             .foregroundStyle(.muncakinSecondary)
 
                         PriorityTag(priority: item.priority)
+                        OwnershipTag(ownership: item.ownership)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
