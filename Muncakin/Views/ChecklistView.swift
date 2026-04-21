@@ -8,8 +8,7 @@ struct ChecklistView: View {
     @Bindable var trip: Trip
 
     @State private var showAddItem = false
-    @State private var itemToEdit: GearItem?
-    @State private var showDeleteConfirmation = false
+    @State private var showFinishConfirmation = false
 
     private var packedCount: Int {
         trip.generatedList.filter(\.isPacked).count
@@ -17,6 +16,10 @@ struct ChecklistView: View {
 
     private var totalCount: Int {
         trip.generatedList.count
+    }
+
+    private var unpackedCount: Int {
+        trip.generatedList.filter { !$0.isPacked }.count
     }
 
     private var progress: Double {
@@ -34,6 +37,12 @@ struct ChecklistView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: Theme.cardSpacing) {
+                // Unpacked summary card
+                UnpackedSummaryCard(
+                    unpackedCount: unpackedCount,
+                    totalCount: totalCount
+                )
+
                 // Progress card
                 progressCard
 
@@ -43,15 +52,6 @@ struct ChecklistView: View {
                 } else {
                     gearCards
                 }
-
-                // Delete trip CTA
-                Button {
-                    showDeleteConfirmation = true
-                } label: {
-                    Text("Selesaikan Pendakian")
-                        .destructiveCTAStyle()
-                }
-                .padding(.top, 8)
             }
             .padding(.horizontal, Theme.screenPadding)
             .padding(.vertical, 8)
@@ -66,16 +66,22 @@ struct ChecklistView: View {
                     Label("Add Item", systemImage: "plus")
                 }
             }
+
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    showFinishConfirmation = true
+                } label: {
+                    Label("Finish Trip", systemImage: "xmark.circle")
+                        .foregroundStyle(.red)
+                }
+            }
         }
         .sheet(isPresented: $showAddItem) {
             ItemFormView(trip: trip)
         }
-        .sheet(item: $itemToEdit) { item in
-            ItemFormView(existingItem: item)
-        }
         .confirmationDialog(
             "Selesaikan Pendakian?",
-            isPresented: $showDeleteConfirmation,
+            isPresented: $showFinishConfirmation,
             titleVisibility: .visible
         ) {
             Button("Selesaikan Pendakian", role: .destructive) {
@@ -138,30 +144,17 @@ struct ChecklistView: View {
 
     private var gearCards: some View {
         ForEach(groupedItems, id: \.category) { group in
-            VStack(alignment: .leading, spacing: 0) {
-                // Category header
+            VStack(alignment: .leading, spacing: 8) {
                 Text(group.category.rawValue.capitalized)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.muncakinSecondary)
                     .padding(.leading, 4)
-                    .padding(.bottom, 8)
 
-                // Items card — all items in one card per category
-                VStack(spacing: 0) {
-                    ForEach(Array(group.items.enumerated()), id: \.element.id) { index, item in
-                        GearItemCard(item: item) {
-                            itemToEdit = item
-                        } onDelete: {
-                            deleteItem(item)
-                        }
-
-                        if index < group.items.count - 1 {
-                            Divider()
-                                .padding(.leading, 44)
-                        }
+                ForEach(group.items) { item in
+                    GearItemCard(item: item) {
+                        deleteItem(item)
                     }
                 }
-                .floatingCard()
             }
         }
     }
@@ -189,7 +182,7 @@ struct ChecklistView: View {
 #Preview {
     NavigationStack {
         ChecklistView(trip: Trip(
-            mountain: Mountain(name: "Mt. Rinjani", peakAltitude: 3726, terrainType: .volcanic, grade: "Hard"),
+            mountain: Mountain(name: "Mt. Rinjani", peakAltitude: 3726, terrainType: .volcanic, grade: "Grade 4", gradeLevel: 4),
             startDate: .now,
             endDate: Date().addingTimeInterval(86400 * 3)
         ))

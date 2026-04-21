@@ -3,52 +3,15 @@
 import SwiftUI
 import SwiftData
 
-// MARK: - Mock Data
-
-private struct MockMountain: Identifiable, Equatable {
-    let id = UUID()
-    let name: String
-    let altitude: Int
-    let terrain: TerrainType
-    let grade: String
-    let gradeExplanation: String
-
-    static func == (lhs: MockMountain, rhs: MockMountain) -> Bool {
-        lhs.name == rhs.name
-    }
-}
-
-private let allMockMountains: [MockMountain] = [
-    MockMountain(name: "Mt. Rinjani", altitude: 3726, terrain: .volcanic, grade: "Grade 4", gradeExplanation: "Jalur sangat menantang dengan medan terjal, membutuhkan pengalaman mendaki dan peralatan lengkap."),
-    MockMountain(name: "Mt. Semeru", altitude: 3676, terrain: .jungle, grade: "Grade 4", gradeExplanation: "Pendakian panjang dan berat dengan risiko aktivitas vulkanik, hanya untuk pendaki berpengalaman."),
-    MockMountain(name: "Mt. Bromo", altitude: 2329, terrain: .volcanic, grade: "Grade 1", gradeExplanation: "Jalur mudah dan pendek, cocok untuk pemula dan wisatawan umum."),
-    MockMountain(name: "Mt. Merbabu", altitude: 3145, terrain: .alpine, grade: "Grade 2", gradeExplanation: "Jalur moderat dengan medan terbuka, cocok untuk pendaki dengan sedikit pengalaman."),
-    MockMountain(name: "Mt. Prau", altitude: 2590, terrain: .rocky, grade: "Grade 1", gradeExplanation: "Jalur pendek dan landai, sangat cocok untuk pendaki pemula."),
-    MockMountain(name: "Mt. Ciremai", altitude: 3078, terrain: .jungle, grade: "Grade 3", gradeExplanation: "Jalur cukup menantang dengan hutan lebat dan tanjakan curam, membutuhkan stamina baik."),
-    MockMountain(name: "Mt. Kerinci", altitude: 3805, terrain: .jungle, grade: "Grade 4", gradeExplanation: "Gunung tertinggi di Sumatera, jalur panjang dan berat menembus hutan tropis lebat."),
-    MockMountain(name: "Mt. Papandayan", altitude: 2665, terrain: .volcanic, grade: "Grade 2", gradeExplanation: "Jalur moderat dengan pemandangan kawah aktif, cocok untuk pendaki menengah."),
-]
-
-// MARK: - AddTripView
-
 struct AddTripView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selectedMountain: MockMountain?
+    let selectedMountain: MountainInfo
+
     @State private var startDate = Date()
     @State private var endDate = Date().addingTimeInterval(86400 * 2)
     @State private var numberOfPeople = 1
-    @State private var mountainSearchText = ""
-
-    private var filteredMountains: [MockMountain] {
-        if mountainSearchText.isEmpty {
-            return allMockMountains
-        }
-        return allMockMountains.filter {
-            $0.name.localizedCaseInsensitiveContains(mountainSearchText)
-        }
-    }
 
     private var durationDays: Int {
         let days = Calendar.current.dateComponents([.day], from: startDate, to: endDate).day ?? 0
@@ -56,58 +19,54 @@ struct AddTripView: View {
     }
 
     var body: some View {
-        Form {
-            Section("Destinasi") {
-                NavigationLink {
-                    MountainPickerView(
-                        mountains: filteredMountains,
-                        selection: $selectedMountain,
-                        searchText: $mountainSearchText
-                    )
-                } label: {
+        ScrollView {
+            LazyVStack(spacing: Theme.cardSpacing) {
+                // Mountain header (read-only with info icon)
+                MountainHeaderCard(mountain: selectedMountain)
+
+                // Schedule
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Schedule")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.muncakinSecondary)
+
+                    DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                        .tint(.muncakinPrimary)
+                    DatePicker("End Date", selection: $endDate, in: startDate..., displayedComponents: .date)
+                        .tint(.muncakinPrimary)
+
                     HStack {
-                        Text("Gunung")
+                        Text("Duration")
                         Spacer()
-                        if let mountain = selectedMountain {
-                            Text(mountain.name)
-                                .foregroundStyle(.muncakinPrimary)
-                            GradeTag(grade: mountain.grade)
-                        } else {
-                            Text("Pilih")
-                                .foregroundStyle(.muncakinPrimary)
-                        }
+                        Text("\(durationDays) day\(durationDays == 1 ? "" : "s")")
+                            .foregroundStyle(.muncakinSecondary)
                     }
                 }
-            }
+                .floatingCard()
 
-            Section("Schedule") {
-                DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
-                    .tint(.muncakinPrimary)
-                DatePicker("End Date", selection: $endDate, in: startDate..., displayedComponents: .date)
-                    .tint(.muncakinPrimary)
-                HStack {
-                    Text("Duration")
-                    Spacer()
-                    Text("\(durationDays) day\(durationDays == 1 ? "" : "s")")
+                // Group
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Group")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.muncakinSecondary)
+
+                    Stepper("\(numberOfPeople) \(numberOfPeople == 1 ? "person" : "people")", value: $numberOfPeople, in: 1...20)
                 }
-            }
+                .floatingCard()
 
-            Section("Group") {
-                Stepper("\(numberOfPeople) \(numberOfPeople == 1 ? "person" : "people")", value: $numberOfPeople, in: 1...20)
-            }
-
-            Section {
+                // Create button
                 Button {
                     createTrip()
                 } label: {
                     Text("Tambah Pendakian")
-                        .primaryCTAStyle(isDisabled: selectedMountain == nil)
+                        .primaryCTAStyle()
                 }
-                .disabled(selectedMountain == nil)
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
+                .padding(.top, 8)
             }
+            .padding(.horizontal, Theme.screenPadding)
+            .padding(.vertical, 8)
         }
+        .background(Color.muncakinScreenBackground.ignoresSafeArea())
         .navigationTitle("Pendakian Baru")
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: startDate) { _, newStart in
@@ -118,67 +77,30 @@ struct AddTripView: View {
     }
 
     private func createTrip() {
-        guard let data = selectedMountain else { return }
-
-        let mountain = Mountain(
-            name: data.name,
-            peakAltitude: data.altitude,
-            terrainType: data.terrain,
-            grade: data.grade,
-            gradeExplanation: data.gradeExplanation
+        let mountainModel = Mountain(
+            name: selectedMountain.name,
+            peakAltitude: selectedMountain.altitude,
+            terrainType: selectedMountain.terrain,
+            grade: "Grade \(selectedMountain.gradeLevel)",
+            gradeLevel: selectedMountain.gradeLevel,
+            gradeExplanation: selectedMountain.gradeExplanation
         )
-        modelContext.insert(mountain)
+        modelContext.insert(mountainModel)
 
         let trip = Trip(
-            mountain: mountain,
+            mountain: mountainModel,
             startDate: startDate,
             endDate: endDate,
             numberOfPeople: numberOfPeople
         )
-        // TODO: Generate dynamic packing list based on mountain data and trip duration
         modelContext.insert(trip)
         dismiss()
     }
 }
 
-// MARK: - Mountain Picker (Floating Cards)
-
-private struct MountainPickerView: View {
-    let mountains: [MockMountain]
-    @Binding var selection: MockMountain?
-    @Binding var searchText: String
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        ScrollView {
-            LazyVStack(spacing: Theme.cardSpacing) {
-                ForEach(mountains) { mountain in
-                    MountainSelectionCard(
-                        name: mountain.name,
-                        altitude: mountain.altitude,
-                        terrain: mountain.terrain,
-                        grade: mountain.grade,
-                        gradeExplanation: mountain.gradeExplanation,
-                        isSelected: selection?.name == mountain.name
-                    ) {
-                        selection = mountain
-                        dismiss()
-                    }
-                }
-            }
-            .padding(.horizontal, Theme.screenPadding)
-            .padding(.vertical, 8)
-        }
-        .background(Color.muncakinScreenBackground.ignoresSafeArea())
-        .navigationTitle("Pilih Gunung")
-        .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, prompt: "Cari Gunung")
-    }
-}
-
 #Preview {
     NavigationStack {
-        AddTripView()
+        AddTripView(selectedMountain: MountainCatalog.all.first!)
     }
     .modelContainer(for: Trip.self, inMemory: true)
 }

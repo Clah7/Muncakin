@@ -3,21 +3,23 @@
 import SwiftUI
 
 struct GradeTag: View {
-    let grade: String
+    let gradeLevel: Int
+
+    private var label: String { "Grade \(gradeLevel)" }
 
     private var color: Color {
-        switch grade {
-        case "Grade 1": .muncakinPrimary
-        case "Grade 2": .yellow
-        case "Grade 3": .yellow
-        case "Grade 4": .orange
-        case "Grade 5": .red
+        switch gradeLevel {
+        case 1: .muncakinPrimary
+        case 2: .yellow
+        case 3: .orange
+        case 4: .red
+        case 5: .red
         default: .muncakinSecondary
         }
     }
 
     var body: some View {
-        Text(grade)
+        Text(label)
             .font(.caption2)
             .fontWeight(.semibold)
             .padding(.horizontal, 7)

@@ -21,32 +21,12 @@ struct ContentView: View {
                     .zIndex(1)
             } else {
                 NavigationStack {
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: Theme.cardSpacing) {
-                            // MARK: - My Trips
-                            if !trips.isEmpty {
-                                myTripsSection
-                            }
-
-                            // MARK: - Explore Mountains
-                            exploreMountainsSection
+                    Group {
+                        if let activeTrip = trips.first {
+                            ChecklistView(trip: activeTrip)
+                        } else {
+                            discoveryView
                         }
-                        .padding(.horizontal, Theme.screenPadding)
-                        .padding(.vertical, 8)
-                    }
-                    .background(Color.muncakinScreenBackground.ignoresSafeArea())
-                    .navigationTitle("Muncakin")
-                    .searchable(text: $searchText, prompt: "Cari Gunung")
-                    .alert(
-                        "Grade \(activeGradeAlert ?? 0)",
-                        isPresented: Binding(
-                            get: { activeGradeAlert != nil },
-                            set: { if !$0 { activeGradeAlert = nil } }
-                        )
-                    ) {
-                        Button("OK", role: .cancel) {}
-                    } message: {
-                        Text(gradeDescription(for: activeGradeAlert ?? 0))
                     }
                 }
                 .transition(.move(edge: .bottom))
@@ -61,28 +41,30 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - My Trips Section
+    // MARK: - Discovery View
 
-    private var myTripsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("My Trips")
-                .font(.headline)
-                .padding(.leading, 4)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: Theme.cardSpacing) {
-                    ForEach(trips) { trip in
-                        NavigationLink {
-                            ChecklistView(trip: trip)
-                        } label: {
-                            TripCard(trip: trip)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+    private var discoveryView: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: Theme.cardSpacing) {
+                exploreMountainsSection
             }
+            .padding(.horizontal, Theme.screenPadding)
+            .padding(.vertical, 8)
         }
-        .padding(.bottom, 8)
+        .background(Color.muncakinScreenBackground.ignoresSafeArea())
+        .navigationTitle("Muncakin")
+        .searchable(text: $searchText, prompt: "Cari Gunung")
+        .alert(
+            "Grade \(activeGradeAlert ?? 0)",
+            isPresented: Binding(
+                get: { activeGradeAlert != nil },
+                set: { if !$0 { activeGradeAlert = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(gradeDescription(for: activeGradeAlert ?? 0))
+        }
     }
 
     // MARK: - Explore Mountains Section

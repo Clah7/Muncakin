@@ -6,7 +6,7 @@ struct MountainSelectionCard: View {
     let name: String
     let altitude: Int
     let terrain: TerrainType
-    let grade: String
+    let gradeLevel: Int
     let gradeExplanation: String
     let isSelected: Bool
     let onTap: () -> Void
@@ -41,7 +41,7 @@ struct MountainSelectionCard: View {
 
                         Spacer()
 
-                        GradeTag(grade: grade)
+                        GradeTag(gradeLevel: gradeLevel)
                     }
 
                     HStack(spacing: 12) {
@@ -66,7 +66,7 @@ struct MountainSelectionCard: View {
                     .strokeBorder(Color.muncakinPrimary, lineWidth: 2)
             }
         }
-        .alert(grade, isPresented: $showGradeInfo) {
+        .alert("Grade \(gradeLevel)", isPresented: $showGradeInfo) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(gradeExplanation)

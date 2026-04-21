@@ -14,6 +14,7 @@ final class GearItem {
     var isPacked: Bool
     var quantity: Double
     var unit: MeasurementUnit
+    var notes: String
 
     @Relationship(inverse: \Trip.generatedList)
     var trips: [Trip]?
@@ -26,7 +27,8 @@ final class GearItem {
         ownership: ItemOwnership,
         isPacked: Bool = false,
         quantity: Double = 1,
-        unit: MeasurementUnit = .pcs
+        unit: MeasurementUnit = .pcs,
+        notes: String = ""
     ) {
         self.id = UUID()
         self.name = name
@@ -37,5 +39,6 @@ final class GearItem {
         self.isPacked = isPacked
         self.quantity = quantity
         self.unit = unit
+        self.notes = notes
     }
 }
