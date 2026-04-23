@@ -182,7 +182,7 @@ struct ChecklistView: View {
 #Preview {
     NavigationStack {
         ChecklistView(trip: Trip(
-            mountain: Mountain(name: "Mt. Rinjani", peakAltitude: 3726, terrainType: .volcanic, grade: "Grade 4", gradeLevel: 4),
+            mountain: Mountain(name: "Gunung Rinjani", peakAltitude: 3726, terrainType: .mixed, grade: "Advanced", gradeLevel: 4, durationEstimation: 3),
             startDate: .now,
             endDate: Date().addingTimeInterval(86400 * 3)
         ))

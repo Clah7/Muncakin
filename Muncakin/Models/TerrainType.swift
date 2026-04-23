@@ -3,11 +3,10 @@
 import Foundation
 
 enum TerrainType: String, Codable, CaseIterable, Identifiable {
-    case jungle
-    case rocky
-    case volcanic
-    case alpine
-    case desert
+    case forest = "Hutan Tropis"
+    case rocky = "Berbatu / Vulkanik"
+    case savanna = "Sabana"
+    case mixed = "Campuran"
 
     var id: String { rawValue }
 }

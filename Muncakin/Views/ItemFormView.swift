@@ -11,11 +11,11 @@ struct ItemFormView: View {
     var trip: Trip?
 
     @State private var name: String = ""
-    @State private var quantity: Double = 1
-    @State private var unit: MeasurementUnit = .pcs
-    @State private var category: GearCategory = .tambahan
-    @State private var priority: ItemPriority = .opsional
-    @State private var ownership: ItemOwnership = .pribadi
+    @State private var quantity: Int = 1
+    @State private var unit: String = "pcs"
+    @State private var category: GearCategory = .others
+    @State private var priority: GearPriority = .optional
+    @State private var ownership: GearOwnership = .personal
 
     private var isEditing: Bool { existingItem != nil }
 
@@ -32,32 +32,35 @@ struct ItemFormView: View {
                         Text("Kuantitas")
                         Spacer()
                         TextField("Qty", value: $quantity, format: .number)
-                            .keyboardType(.decimalPad)
+                            .keyboardType(.numberPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
                             .foregroundStyle(.muncakinPrimary)
                     }
-                    Picker("Satuan", selection: $unit) {
-                        ForEach(MeasurementUnit.allCases) { u in
-                            Text(u.abbreviation).tag(u)
-                        }
+                    HStack {
+                        Text("Satuan")
+                        Spacer()
+                        TextField("Unit", text: $unit)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 120)
+                            .foregroundStyle(.muncakinPrimary)
                     }
                 }
 
                 Section("Klasifikasi") {
                     Picker("Category", selection: $category) {
                         ForEach(GearCategory.allCases) { cat in
-                            Text(cat.rawValue.capitalized).tag(cat)
+                            Text(cat.rawValue).tag(cat)
                         }
                     }
                     Picker("Priority", selection: $priority) {
-                        ForEach(ItemPriority.allCases) { p in
-                            Text(p.rawValue.capitalized).tag(p)
+                        ForEach(GearPriority.allCases) { p in
+                            Text(p.rawValue).tag(p)
                         }
                     }
                     Picker("Ownership", selection: $ownership) {
-                        ForEach(ItemOwnership.allCases) { o in
-                            Text(o.rawValue.capitalized).tag(o)
+                        ForEach(GearOwnership.allCases) { o in
+                            Text(o.rawValue).tag(o)
                         }
                     }
                 }
@@ -110,12 +113,11 @@ struct ItemFormView: View {
         } else {
             let item = GearItem(
                 name: trimmedName,
-                category: category,
-                triggerCondition: GearCondition(),
-                priority: priority,
-                ownership: ownership,
                 quantity: quantity,
-                unit: unit
+                unit: unit,
+                category: category,
+                ownership: ownership,
+                priority: priority
             )
             modelContext.insert(item)
             trip?.generatedList.append(item)
@@ -127,7 +129,7 @@ struct ItemFormView: View {
 
 #Preview("Add Mode") {
     ItemFormView(trip: Trip(
-        mountain: Mountain(name: "Mt. Rinjani", peakAltitude: 3726, terrainType: .volcanic, grade: "Hard"),
+        mountain: Mountain(name: "Gunung Rinjani", peakAltitude: 3726, terrainType: .mixed, grade: "Advanced", gradeLevel: 4, durationEstimation: 3),
         startDate: .now,
         endDate: Date().addingTimeInterval(86400 * 3)
     ))

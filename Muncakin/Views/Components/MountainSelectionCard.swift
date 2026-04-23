@@ -46,7 +46,7 @@ struct MountainSelectionCard: View {
 
                     HStack(spacing: 12) {
                         Label("\(altitude)m", systemImage: "arrow.up.right")
-                        Label(terrain.rawValue.capitalized, systemImage: "leaf")
+                        Label(terrain.rawValue, systemImage: "leaf")
                     }
                     .font(.caption)
                     .foregroundStyle(.muncakinSecondary)

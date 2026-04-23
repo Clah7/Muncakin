@@ -81,17 +81,25 @@ struct AddTripView: View {
             name: selectedMountain.name,
             peakAltitude: selectedMountain.altitude,
             terrainType: selectedMountain.terrain,
-            grade: "Grade \(selectedMountain.gradeLevel)",
+            grade: selectedMountain.grade,
             gradeLevel: selectedMountain.gradeLevel,
-            gradeExplanation: selectedMountain.gradeExplanation
+            durationEstimation: selectedMountain.durationEstimation,
+            gradeExplanation: selectedMountain.gradeExplanation,
+            imageName: selectedMountain.imageName
         )
         modelContext.insert(mountainModel)
+
+        let defaultItems = GearItem.defaultGear
+        for item in defaultItems {
+            modelContext.insert(item)
+        }
 
         let trip = Trip(
             mountain: mountainModel,
             startDate: startDate,
             endDate: endDate,
-            numberOfPeople: numberOfPeople
+            numberOfPeople: numberOfPeople,
+            generatedList: defaultItems
         )
         modelContext.insert(trip)
         dismiss()

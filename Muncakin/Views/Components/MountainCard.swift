@@ -7,10 +7,12 @@ struct MountainCard: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            Image(systemName: "mountain.2.fill")
-                .font(.title3)
-                .foregroundStyle(.muncakinPrimary)
-                .frame(width: 36)
+            Image(mountain.imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 64, height: 64)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
@@ -25,7 +27,7 @@ struct MountainCard: View {
 
                 HStack(spacing: 12) {
                     Label("\(mountain.altitude)m", systemImage: "arrow.up.right")
-                    Label(mountain.terrain.rawValue.capitalized, systemImage: "leaf")
+                    Label(mountain.terrain.rawValue, systemImage: "leaf")
                 }
                 .font(.caption)
                 .foregroundStyle(.muncakinSecondary)

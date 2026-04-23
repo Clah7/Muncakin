@@ -111,12 +111,12 @@ struct ContentView: View {
 
     private func gradeDescription(for grade: Int) -> String {
         switch grade {
-        case 1: "Beginner friendly. Easy trails suitable for first-time hikers and casual tourists."
-        case 2: "Moderate difficulty. Requires basic fitness and some hiking experience."
-        case 3: "Challenging. Steep terrain and dense forests requiring good stamina and preparation."
-        case 4: "Very difficult. Demanding trails for experienced hikers with full gear."
-        case 5: "Expert mountaineers only. Extreme conditions requiring advanced skills and equipment."
-        default: "No description available."
+        case 1: "Ramah pemula. Jalur mudah yang cocok untuk pendaki pertama kali dan wisatawan kasual."
+        case 2: "Tingkat kesulitan sedang. Membutuhkan kebugaran fisik dasar dan sedikit pengalaman mendaki."
+        case 3: "Menantang. Medan terjal dan hutan lebat yang membutuhkan stamina dan persiapan yang matang."
+        case 4: "Sangat sulit. Jalur yang menuntut fisik untuk pendaki berpengalaman dengan perlengkapan lengkap."
+        case 5: "Hanya untuk pendaki ahli (expert). Kondisi ekstrem yang membutuhkan keterampilan dan peralatan tingkat lanjut."
+        default: "Tidak ada penjelasan."
         }
     }
 }

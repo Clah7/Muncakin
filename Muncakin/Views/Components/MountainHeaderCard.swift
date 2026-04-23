@@ -32,7 +32,7 @@ struct MountainHeaderCard: View {
 
                     HStack(spacing: 12) {
                         Label("\(mountain.altitude)m", systemImage: "arrow.up.right")
-                        Label(mountain.terrain.rawValue.capitalized, systemImage: "leaf")
+                        Label(mountain.terrain.rawValue, systemImage: "leaf")
                     }
                     .font(.caption)
                     .foregroundStyle(.muncakinSecondary)
