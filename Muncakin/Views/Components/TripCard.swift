@@ -6,11 +6,11 @@ struct TripCard: View {
     let trip: Trip
 
     private var packedCount: Int {
-        trip.generatedList.filter(\.isPacked).count
+        trip.gearList.filter(\.isPacked).count
     }
 
     private var totalCount: Int {
-        trip.generatedList.count
+        trip.gearList.count
     }
 
     private var progress: Double {
@@ -30,7 +30,7 @@ struct TripCard: View {
             }
 
             HStack(spacing: 10) {
-                Label("\(trip.durationDays)d", systemImage: "calendar")
+                Label("\(trip.durationInDays)d", systemImage: "calendar")
                 Label("\(trip.numberOfPeople)", systemImage: "person")
             }
             .font(.caption)

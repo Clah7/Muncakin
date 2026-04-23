@@ -120,7 +120,7 @@ struct ItemFormView: View {
                 priority: priority
             )
             modelContext.insert(item)
-            trip?.generatedList.append(item)
+            trip?.gearList.append(item)
         }
 
         dismiss()

@@ -1,68 +1,92 @@
-// Views/Components/GearItemCard.swift
+// Views/Components/GearItemRow.swift
 
 import SwiftUI
 import SwiftData
 
-struct GearItemCard: View {
+struct GearItemRow: View {
     @Bindable var item: GearItem
-    let onDelete: () -> Void
-
-    private var quantityLabel: String {
-        "\(item.quantity) \(item.unit)"
-    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Top row: Name, quantity, unit, toggle
-            HStack(spacing: 12) {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        item.isPacked.toggle()
-                    }
-                } label: {
-                    Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
-                        .font(.title3)
-                        .foregroundStyle(item.isPacked ? .muncakinPrimary : .muncakinSecondary.opacity(0.4))
+        HStack(spacing: 12) {
+            // Checkbox: toggles isPacked directly via @Bindable
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    item.isPacked.toggle()
                 }
-                .buttonStyle(.plain)
+            } label: {
+                Image(systemName: item.isPacked ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(
+                        item.isPacked
+                            ? .muncakinPrimary
+                            : .muncakinSecondary.opacity(0.4)
+                    )
+            }
+            .buttonStyle(.plain)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(item.name)
-                        .font(.body.weight(.medium))
-                        .strikethrough(item.isPacked, color: .muncakinSecondary)
-                        .foregroundStyle(item.isPacked ? .muncakinSecondary : .primary)
+            // Item details
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.name)
+                    .font(.body.weight(.medium))
+                    .strikethrough(item.isPacked, color: .muncakinSecondary)
+                    .foregroundStyle(item.isPacked ? .muncakinSecondary : .primary)
 
-                    Label(quantityLabel, systemImage: "scalemass")
+                HStack(spacing: 8) {
+                    Label("\(item.quantity) \(item.unit)", systemImage: "scalemass")
                         .font(.caption)
                         .foregroundStyle(.muncakinSecondary)
+
+                    if item.isRented {
+                        Text("Sewa")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.orange)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1)
+                            .background(.orange.opacity(0.12))
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                    }
                 }
 
-                Spacer()
+                // Ownership & Priority tags
+                HStack(spacing: 6) {
+                    Text(item.priority.rawValue)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(item.priority == .mandatory ? .red : .muncakinPrimary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            (item.priority == .mandatory ? Color.red : Color.muncakinPrimary)
+                                .opacity(0.12)
+                        )
+                        .clipShape(Capsule())
 
-                Button(role: .destructive, action: onDelete) {
-                    Image(systemName: "trash")
+                    Text(item.ownership.rawValue)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.muncakinSecondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.muncakinSecondary.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+
+                // Notes: read-only, only shown when not empty
+                if !item.notes.isEmpty {
+                    Text(item.notes)
                         .font(.caption)
-                        .foregroundStyle(.red.opacity(0.6))
+                        .foregroundStyle(.orange)
+                        .lineLimit(2)
                 }
-                .buttonStyle(.plain)
             }
 
-            // Middle row: Priority + Ownership tags
-            HStack(spacing: 6) {
-                PriorityTag(priority: item.priority)
-                OwnershipTag(ownership: item.ownership)
-            }
-            .padding(.leading, 36)
+            Spacer()
 
-            // Bottom: Notes text field
-            TextField("Add notes...", text: $item.notes, axis: .vertical)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(10)
-                .background(Color(.systemGray6))
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .padding(.leading, 36)
+            // Chevron indicates the row is tappable (edit)
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.muncakinSecondary.opacity(0.5))
         }
-        .floatingCard()
+        .padding(Theme.cardPadding)
+        .background(Color.muncakinCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
     }
 }

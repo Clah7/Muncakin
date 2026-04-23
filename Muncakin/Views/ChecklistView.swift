@@ -9,48 +9,47 @@ struct ChecklistView: View {
 
     @State private var showAddItem = false
     @State private var showFinishConfirmation = false
+    @State private var itemToEdit: GearItem?
+
+    // MARK: - Derived Data
 
     private var packedCount: Int {
-        trip.generatedList.filter(\.isPacked).count
+        trip.gearList.filter(\.isPacked).count
     }
 
     private var totalCount: Int {
-        trip.generatedList.count
-    }
-
-    private var unpackedCount: Int {
-        trip.generatedList.filter { !$0.isPacked }.count
+        trip.gearList.count
     }
 
     private var progress: Double {
         totalCount == 0 ? 0 : Double(packedCount) / Double(totalCount)
     }
 
+    /// Groups gear items by category, preserving the canonical enum order.
     private var groupedItems: [(category: GearCategory, items: [GearItem])] {
-        let grouped = Dictionary(grouping: trip.generatedList) { $0.category }
+        let grouped = Dictionary(grouping: trip.gearList) { $0.category }
         return GearCategory.allCases.compactMap { category in
             guard let items = grouped[category], !items.isEmpty else { return nil }
             return (category: category, items: items)
         }
     }
 
+    // MARK: - Body
+
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: Theme.cardSpacing) {
-                // Unpacked summary card
-                UnpackedSummaryCard(
-                    unpackedCount: unpackedCount,
-                    totalCount: totalCount
-                )
+            VStack(spacing: Theme.cardSpacing) {
+                // Hero header combines mountain info + trip summary
+                HeroHeaderCard(trip: trip)
 
-                // Progress card
+                // Progress bar
                 progressCard
 
-                // Gear items
-                if trip.generatedList.isEmpty {
+                // Gear list grouped by category
+                if trip.gearList.isEmpty {
                     emptyState
                 } else {
-                    gearCards
+                    gearList
                 }
             }
             .padding(.horizontal, Theme.screenPadding)
@@ -63,7 +62,7 @@ struct ChecklistView: View {
                 Button {
                     showAddItem = true
                 } label: {
-                    Label("Add Item", systemImage: "plus")
+                    Label("Tambah Barang", systemImage: "plus")
                 }
             }
 
@@ -71,13 +70,16 @@ struct ChecklistView: View {
                 Button {
                     showFinishConfirmation = true
                 } label: {
-                    Label("Finish Trip", systemImage: "xmark.circle")
+                    Label("Selesaikan", systemImage: "xmark.circle")
                         .foregroundStyle(.red)
                 }
             }
         }
         .sheet(isPresented: $showAddItem) {
             ItemFormView(trip: trip)
+        }
+        .sheet(item: $itemToEdit) { item in
+            EditGearView(item: item)
         }
         .confirmationDialog(
             "Selesaikan Pendakian?",
@@ -95,25 +97,16 @@ struct ChecklistView: View {
     // MARK: - Progress Card
 
     private var progressCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                Image(systemName: "mountain.2.fill")
-                    .font(.title)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(trip.mountain?.name ?? "Unknown Mountain")
-                        .font(.headline)
-                    Text("\(trip.durationDays) day\(trip.durationDays == 1 ? "" : "s") · \(trip.numberOfPeople) \(trip.numberOfPeople == 1 ? "person" : "people")")
-                        .font(.caption)
-                        .foregroundStyle(.muncakinSecondary)
-                }
-
-                Spacer()
-
-                Text("\(packedCount)/\(totalCount)")
-                    .font(.subheadline.weight(.bold))
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("\(packedCount)/\(totalCount) dikemas")
+                    .font(.subheadline.weight(.semibold))
                     .monospacedDigit()
-                    .foregroundStyle(.muncakinPrimary)
+                Spacer()
+                if progress == 1.0 && totalCount > 0 {
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundStyle(.green)
+                }
             }
 
             ProgressView(value: progress)
@@ -140,19 +133,23 @@ struct ChecklistView: View {
         .floatingCard()
     }
 
-    // MARK: - Gear Cards
+    // MARK: - Gear List
 
-    private var gearCards: some View {
-        ForEach(groupedItems, id: \.category) { group in
-            VStack(alignment: .leading, spacing: 8) {
-                Text(group.category.rawValue.capitalized)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.muncakinSecondary)
-                    .padding(.leading, 4)
+    private var gearList: some View {
+        LazyVStack(spacing: Theme.cardSpacing) {
+            ForEach(groupedItems, id: \.category) { group in
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(group.category.rawValue)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.muncakinSecondary)
+                        .padding(.leading, 4)
 
-                ForEach(group.items) { item in
-                    GearItemCard(item: item) {
-                        deleteItem(item)
+                    ForEach(group.items) { item in
+                        GearItemRow(item: item)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                itemToEdit = item
+                            }
                     }
                 }
             }
@@ -161,17 +158,7 @@ struct ChecklistView: View {
 
     // MARK: - Actions
 
-    private func deleteItem(_ item: GearItem) {
-        withAnimation {
-            trip.generatedList.removeAll { $0.id == item.id }
-            modelContext.delete(item)
-        }
-    }
-
     private func deleteTrip() {
-        for item in trip.generatedList {
-            modelContext.delete(item)
-        }
         if let mountain = trip.mountain {
             modelContext.delete(mountain)
         }
@@ -182,7 +169,14 @@ struct ChecklistView: View {
 #Preview {
     NavigationStack {
         ChecklistView(trip: Trip(
-            mountain: Mountain(name: "Gunung Rinjani", peakAltitude: 3726, terrainType: .mixed, grade: "Advanced", gradeLevel: 4, durationEstimation: 3),
+            mountain: Mountain(
+                name: "Gunung Rinjani",
+                peakAltitude: 3726,
+                terrainType: .mixed,
+                grade: "Advanced",
+                gradeLevel: 4,
+                durationEstimation: 3
+            ),
             startDate: .now,
             endDate: Date().addingTimeInterval(86400 * 3)
         ))

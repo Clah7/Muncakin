@@ -40,3 +40,14 @@ struct MountainCard: View {
         .floatingCard()
     }
 }
+
+#Preview {
+    Group {
+        if let firstMountain = MountainCatalog.all.first {
+            MountainCard(mountain: firstMountain)
+        } else {
+            Text("No Mountains Available")
+        }
+    }
+    .padding()
+}
