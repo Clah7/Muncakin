@@ -2,9 +2,9 @@
 
 import Foundation
 
-enum ItemPriority: String, Codable, CaseIterable, Identifiable {
-    case wajib
-    case opsional
+enum GearPriority: String, Codable, CaseIterable, Identifiable {
+    case mandatory = "Wajib"
+    case optional = "Opsional"
 
     var id: String { rawValue }
 }

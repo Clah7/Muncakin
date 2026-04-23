@@ -3,11 +3,12 @@
 import Foundation
 
 enum GearCategory: String, Codable, CaseIterable, Identifiable {
-    case pakaian
-    case tenda
-    case makanan
-    case medis
-    case tambahan
+    case shelter = "Shelter"
+    case personal = "Barang Pribadi"
+    case logistics = "Logistik & Makanan"
+    case safety = "Safety Tools"
+    case medical = "P3K"
+    case others = "Lainnya"
 
     var id: String { rawValue }
 }

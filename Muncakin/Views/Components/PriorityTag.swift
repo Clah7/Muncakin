@@ -3,17 +3,17 @@
 import SwiftUI
 
 struct PriorityTag: View {
-    let priority: ItemPriority
+    let priority: GearPriority
 
     private var color: Color {
         switch priority {
-        case .wajib: .red
-        case .opsional: .muncakinPrimary
+        case .mandatory: .red
+        case .optional: .muncakinPrimary
         }
     }
 
     var body: some View {
-        Text(priority.rawValue.capitalized)
+        Text(priority.rawValue)
             .font(.caption2)
             .fontWeight(.medium)
             .padding(.horizontal, 6)

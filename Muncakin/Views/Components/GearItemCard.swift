@@ -8,10 +8,7 @@ struct GearItemCard: View {
     let onDelete: () -> Void
 
     private var quantityLabel: String {
-        let formatted = item.quantity.truncatingRemainder(dividingBy: 1) == 0
-            ? String(format: "%.0f", item.quantity)
-            : String(format: "%.1f", item.quantity)
-        return "\(formatted) \(item.unit.abbreviation)"
+        "\(item.quantity) \(item.unit)"
     }
 
     var body: some View {

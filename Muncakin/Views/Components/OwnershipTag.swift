@@ -3,10 +3,10 @@
 import SwiftUI
 
 struct OwnershipTag: View {
-    let ownership: ItemOwnership
+    let ownership: GearOwnership
 
     var body: some View {
-        Text(ownership.rawValue.capitalized)
+        Text(ownership.rawValue)
             .font(.caption2)
             .fontWeight(.medium)
             .padding(.horizontal, 6)
