@@ -7,13 +7,13 @@ import SwiftData
 final class GearItem {
     @Attribute(.unique) var id: UUID
     var name: String
+    var quantity: Int
+    var unit: String
     var category: GearCategory
-    var triggerCondition: GearCondition
-    var priority: ItemPriority
-    var ownership: ItemOwnership
+    var ownership: GearOwnership
+    var priority: GearPriority
+    var isRented: Bool
     var isPacked: Bool
-    var quantity: Double
-    var unit: MeasurementUnit
     var notes: String
 
     @Relationship(inverse: \Trip.generatedList)
@@ -21,24 +21,24 @@ final class GearItem {
 
     init(
         name: String,
+        quantity: Int,
+        unit: String,
         category: GearCategory,
-        triggerCondition: GearCondition,
-        priority: ItemPriority,
-        ownership: ItemOwnership,
+        ownership: GearOwnership,
+        priority: GearPriority = .mandatory,
+        isRented: Bool = false,
         isPacked: Bool = false,
-        quantity: Double = 1,
-        unit: MeasurementUnit = .pcs,
         notes: String = ""
     ) {
         self.id = UUID()
         self.name = name
-        self.category = category
-        self.triggerCondition = triggerCondition
-        self.priority = priority
-        self.ownership = ownership
-        self.isPacked = isPacked
         self.quantity = quantity
         self.unit = unit
+        self.category = category
+        self.ownership = ownership
+        self.priority = priority
+        self.isRented = isRented
+        self.isPacked = isPacked
         self.notes = notes
     }
 }
