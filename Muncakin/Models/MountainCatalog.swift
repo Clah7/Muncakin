@@ -11,6 +11,8 @@ struct MountainInfo: Identifiable, Hashable {
     let durationEstimation: Int
     let gradeExplanation: String
     let imageName: String
+    let hasSulfur: Bool
+    let isSteep: Bool
 
     static func == (lhs: MountainInfo, rhs: MountainInfo) -> Bool {
         lhs.name == rhs.name
@@ -43,7 +45,9 @@ enum MountainCatalog {
             gradeLevel: m.gradeLevel,
             durationEstimation: m.durationEstimation,
             gradeExplanation: m.gradeExplanation,
-            imageName: m.imageName
+            imageName: m.imageName,
+            hasSulfur: m.hasSulfur,
+            isSteep: m.isSteep
         )
     }
 
