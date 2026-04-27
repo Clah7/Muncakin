@@ -49,6 +49,8 @@ struct ChecklistView: View {
                 } else {
                     gearList
                 }
+
+                finishTripCard
             }
             .padding(.horizontal, Theme.screenPadding)
             .padding(.vertical, 8)
@@ -64,14 +66,6 @@ struct ChecklistView: View {
                 }
             }
 
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    showFinishConfirmation = true
-                } label: {
-                    Label("Selesaikan", systemImage: "xmark.circle")
-                        .foregroundStyle(.red)
-                }
-            }
         }
         .sheet(isPresented: $showAddItem) {
             ItemFormView(trip: trip)
@@ -156,6 +150,26 @@ struct ChecklistView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Finish Trip Card
+
+    private var finishTripCard: some View {
+        Button {
+            showFinishConfirmation = true
+        } label: {
+            HStack {
+                Image(systemName: "xmark.circle.fill")
+                Text("Selesaikan Pendakian")
+                    .fontWeight(.semibold)
+            }
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(.red, in: RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 8)
     }
 
     // MARK: - Actions

@@ -98,10 +98,7 @@ struct AddTripView: View {
             // Grade: item must not exceed the mountain's difficulty level
             guard item.minGradeLevel <= selectedMountain.gradeLevel else { return false }
 
-            // Camping: camping-only gear excluded unless the trip requires overnight stays
             if item.requiresCamping && !isCamping { return false }
-
-            // Rain gear is always included
 
             // Sulfur: sulfur protection gear excluded unless the mountain has sulfur
             if item.isSulfurGear && !selectedMountain.hasSulfur { return false }

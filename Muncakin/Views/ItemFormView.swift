@@ -31,7 +31,7 @@ struct ItemFormView: View {
                     HStack {
                         Text("Kuantitas")
                         Spacer()
-                        TextField("Qty", value: $quantity, format: .number)
+                        TextField("Kuantitas", value: $quantity, format: .number)
                             .keyboardType(.numberPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 80)
@@ -48,17 +48,17 @@ struct ItemFormView: View {
                 }
 
                 Section("Klasifikasi") {
-                    Picker("Category", selection: $category) {
+                    Picker("Kategori", selection: $category) {
                         ForEach(GearCategory.allCases) { cat in
                             Text(cat.rawValue).tag(cat)
                         }
                     }
-                    Picker("Priority", selection: $priority) {
+                    Picker("Prioritas", selection: $priority) {
                         ForEach(GearPriority.allCases) { p in
                             Text(p.rawValue).tag(p)
                         }
                     }
-                    Picker("Ownership", selection: $ownership) {
+                    Picker("Kepemilikan", selection: $ownership) {
                         ForEach(GearOwnership.allCases) { o in
                             Text(o.rawValue).tag(o)
                         }
