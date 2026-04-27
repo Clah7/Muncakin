@@ -19,7 +19,7 @@ class BackgroundTaskManager {
     static let stepCheckTaskID = "com.muncakin.stepCheck"
 
     /// Steps below this threshold in the rolling window imply the hiker is resting.
-    private let stepThreshold: Double = 300
+    private let stepThreshold: Double = 600
 
     /// Rolling window duration: 3 hours.
     private let windowInterval: TimeInterval = 3 * 60 * 60

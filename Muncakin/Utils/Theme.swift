@@ -58,15 +58,14 @@ enum Theme {
     static let cardSpacing: CGFloat = 12
 
     static func configureNavigationBarAppearance() {
+        let largeTitleDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .largeTitle)
+        let inlineTitleDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline)
+
         let largeTitleAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(
-                withTextStyle: .largeTitle
-            ).withDesign(.serif)!, size: 0),
+            .font: UIFont(descriptor: largeTitleDescriptor.withDesign(.serif) ?? largeTitleDescriptor, size: 0),
         ]
         let inlineTitleAttrs: [NSAttributedString.Key: Any] = [
-            .font: UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(
-                withTextStyle: .headline
-            ).withDesign(.serif)!, size: 0),
+            .font: UIFont(descriptor: inlineTitleDescriptor.withDesign(.serif) ?? inlineTitleDescriptor, size: 0),
         ]
 
         let appearance = UINavigationBarAppearance()
