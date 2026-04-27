@@ -9,6 +9,7 @@ struct ChecklistView: View {
 
     @State private var showAddItem = false
     @State private var showFinishConfirmation = false
+    @State private var showGradeInfo = false
     @State private var itemToEdit: GearItem?
 
     // MARK: - Derived Data
@@ -39,11 +40,8 @@ struct ChecklistView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: Theme.cardSpacing) {
-                // Hero header combines mountain info + trip summary
                 HeroHeaderCard(trip: trip)
-
-                // Progress bar
-                progressCard
+                    .onTapGesture { showGradeInfo = true }
 
                 // Gear list grouped by category
                 if trip.gearList.isEmpty {
@@ -92,27 +90,31 @@ struct ChecklistView: View {
         } message: {
             Text("Hal ini akan menghapus seluruh data pendakian dan list barang yang telah disimpan")
         }
+        .sheet(isPresented: $showGradeInfo) {
+            gradeInfoSheet
+        }
     }
 
-    // MARK: - Progress Card
+    // MARK: - Grade Info Sheet
 
-    private var progressCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("\(packedCount)/\(totalCount) dikemas")
-                    .font(.subheadline.weight(.semibold))
-                    .monospacedDigit()
-                Spacer()
-                if progress == 1.0 && totalCount > 0 {
-                    Image(systemName: "checkmark.seal.fill")
-                        .foregroundStyle(.green)
-                }
+    private var gradeInfoSheet: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if let mountain = trip.mountain {
+                Text(mountain.name)
+                    .font(.title3.weight(.bold))
+
+                GradeTag(gradeLevel: mountain.gradeLevel)
+
+                Text(mountain.gradeExplanation)
+                    .font(.body)
+                    .foregroundStyle(.secondary)
             }
 
-            ProgressView(value: progress)
-                .tint(progress == 1.0 ? .green : .muncakinPrimary)
+            Spacer()
         }
-        .floatingCard()
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .presentationDetents([.fraction(0.3), .medium])
     }
 
     // MARK: - Empty State

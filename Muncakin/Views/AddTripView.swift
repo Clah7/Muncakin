@@ -15,13 +15,6 @@ struct AddTripView: View {
     @State private var isRaining = false
 
     // MARK: - Computed Properties (UI Bindings)
-
-    /// The earliest selectable end date, enforcing the mountain's minimum safe duration.
-    ///
-    /// Math: minimumEndDate = startDate + (durationEstimation - 1) days.
-    /// - durationEstimation = 1 → same day as startDate (tektok / day-hike).
-    /// - durationEstimation = 2 → 1 day after startDate.
-    /// - durationEstimation = 3 → 2 days after startDate.
     private var minimumEndDate: Date {
         let offset = max(selectedMountain.durationEstimation - 1, 0)
         return Calendar.current.date(byAdding: .day, value: offset, to: startDate) ?? startDate
@@ -63,8 +56,6 @@ struct AddTripView: View {
                 .floatingCard()
 
                 // MARK: Conditions Card
-                // Note: isCamping is intentionally absent from the UI.
-                // It is auto-calculated from tripDuration at trip creation time.
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Kondisi Pendakian")
                         .font(.subheadline.weight(.semibold))
@@ -104,16 +95,6 @@ struct AddTripView: View {
     }
 
     // MARK: - Date Math
-
-    /// Calculates the trip duration in days, inclusive of both start and end date.
-    ///
-    /// Uses `startOfDay` normalization to strip time components, ensuring
-    /// consistent results regardless of what time-of-day the DatePickers resolve to.
-    ///
-    /// Examples:
-    /// - Apr 12 → Apr 12 = 0 + 1 = 1 day  (Tektok / day-hike)
-    /// - Apr 12 → Apr 13 = 1 + 1 = 2 days
-    /// - Apr 12 → Apr 14 = 2 + 1 = 3 days
     private func calculateDuration(from start: Date, to end: Date) -> Int {
         let calendar = Calendar.current
         let normalizedStart = calendar.startOfDay(for: start)
@@ -124,10 +105,6 @@ struct AddTripView: View {
 
     // MARK: - Smart Filter
 
-    /// Filters the master gear template list based on mountain attributes and trip conditions.
-    ///
-    /// Each boolean flag on a GearItem acts as a gate — the item is only included when the
-    /// corresponding condition (mountain property or user toggle) is active.
     private func filterGear(isCamping: Bool) -> [GearItem] {
         GearItem.defaultGear.filter { item in
             // Grade: item must not exceed the mountain's difficulty level

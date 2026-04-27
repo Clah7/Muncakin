@@ -12,11 +12,10 @@ struct HeroHeaderCard: View {
             // Background: mountain image or gradient fallback
             mountainBackground
 
-            // Gradient overlay so white text stays readable
             LinearGradient(
-                colors: [.clear, .black.opacity(0.75)],
-                startPoint: .center,
-                endPoint: .bottom
+                colors: [.black.opacity(0.75), .clear],
+                startPoint: .leading,
+                endPoint: .trailing
             )
 
             // Foreground text content
@@ -65,7 +64,6 @@ struct HeroHeaderCard: View {
                 .frame(height: 220)
                 .clipped()
         } else {
-            // Gradient placeholder when no image is available
             LinearGradient(
                 colors: [
                     Color.muncakinPrimary,
