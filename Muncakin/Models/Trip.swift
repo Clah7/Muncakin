@@ -14,8 +14,6 @@ final class Trip {
     var isRaining: Bool
     @Relationship(deleteRule: .cascade) var gearList: [GearItem]
 
-    /// Inclusive day count using startOfDay normalization.
-    /// e.g. 12th → 12th = 1 day, 12th → 13th = 2 days.
     var durationInDays: Int {
         let calendar = Calendar.current
         let start = calendar.startOfDay(for: startDate)

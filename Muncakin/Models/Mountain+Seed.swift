@@ -3,8 +3,6 @@
 import Foundation
 
 extension Mountain {
-    /// Creates a fresh set of default mountains.
-    /// Returns new instances each time (required for SwiftData).
     static var defaultMountains: [Mountain] {
         [
             // MARK: - Grade I

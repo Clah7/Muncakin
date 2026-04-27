@@ -3,8 +3,6 @@
 import Foundation
 
 extension GearItem {
-    /// Creates a fresh set of default gear items for a new trip.
-    /// Returns new instances each time (required for SwiftData).
     static var defaultGear: [GearItem] {
         [
             // MARK: - Shelter
