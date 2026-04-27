@@ -12,7 +12,6 @@ struct AddTripView: View {
     @State private var startDate = Date()
     @State private var endDate = Date()
     @State private var numberOfPeople = 1
-    @State private var isRaining = false
 
     // MARK: - Computed Properties (UI Bindings)
     private var minimumEndDate: Date {
@@ -51,18 +50,7 @@ struct AddTripView: View {
                             .foregroundStyle(.muncakinSecondary)
                     }
 
-                    Stepper("Jumlah Orang: \(numberOfPeople)", value: $numberOfPeople, in: 1...30)
-                }
-                .floatingCard()
-
-                // MARK: Conditions Card
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Kondisi Pendakian")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.muncakinSecondary)
-
-                    Toggle("Apakah diprediksi hujan?", isOn: $isRaining)
-                        .tint(.muncakinPrimary)
+                    ModernStepper(value: $numberOfPeople, title: "Jumlah Orang", range: 1...20)
                 }
                 .floatingCard()
 
@@ -70,7 +58,7 @@ struct AddTripView: View {
                 Button {
                     createTrip()
                 } label: {
-                    Text("Buat Pendakian & Generate Checklist")
+                    Text("Buat Checklist")
                         .primaryCTAStyle()
                 }
                 .padding(.top, 8)
@@ -113,8 +101,7 @@ struct AddTripView: View {
             // Camping: camping-only gear excluded unless the trip requires overnight stays
             if item.requiresCamping && !isCamping { return false }
 
-            // Rain: rain gear excluded unless rain is expected
-            if item.isRainGear && !isRaining { return false }
+            // Rain gear is always included
 
             // Sulfur: sulfur protection gear excluded unless the mountain has sulfur
             if item.isSulfurGear && !selectedMountain.hasSulfur { return false }
@@ -128,14 +115,6 @@ struct AddTripView: View {
 
     // MARK: - Quantity Scaling
 
-    /// Determines the scaled quantity for a gear item based on trip duration.
-    ///
-    /// Consumable and daily-wear items scale linearly with trip length:
-    /// - `.logistics` category items (food, water, gas) are consumed daily.
-    /// - Items whose name contains "ganti" (spare clothes) or "kaos kaki" (socks)
-    ///   need one set per day.
-    ///
-    /// All other items (tenda, sepatu, kompas, etc.) keep their base quantity unchanged.
     private func scaledQuantity(for template: GearItem, tripDays: Int) -> Int {
         let lowercasedName = template.name.lowercased()
         let needsScaling = template.category == .logistics
@@ -200,7 +179,7 @@ struct AddTripView: View {
             endDate: endDate,
             numberOfPeople: numberOfPeople,
             isCamping: autoCalculatedIsCamping,
-            isRaining: isRaining,
+            isRaining: true,
             gearList: clonedItems
         )
         modelContext.insert(trip)
